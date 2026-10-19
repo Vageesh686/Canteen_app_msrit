@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MSRIT Canteen — Student</title>
+<meta name="theme-color" content="#1B1033">
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="screen active" id="screen-login">
+  <div class="login-wrap">
+    <div style="font-family:'Baloo 2',sans-serif;font-size:30px;font-weight:800;margin-top:14vh">MSRIT <span style="color:var(--sun)">Canteen</span></div>
+    <p>Skip the line. Rack up streaks. Never miss the good dosa day again.</p>
+    <div class="panel" style="text-align:left;margin-top:18px">
+      <label for="usn">USN / Roll number</label>
+      <input id="usn" type="text" placeholder="e.g. 1MS22CS045" autocomplete="username">
+      <label for="pw">Password</label>
+      <input id="pw" type="password" placeholder="••••••••" autocomplete="current-password">
+      <div class="error-text" id="loginError">Enter your USN and password.</div>
+      <button class="btn btn-hot block" onclick="App.login()">Let's go 🔥</button>
+    </div>
+    <p style="margin-top:14px"><a href="../index.html" style="font-size:13px;color:var(--muted)">← Not a student? Switch portal</a></p>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell" style="display:none">
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">MSRIT <span>Canteen</span></div>
+      <div class="streak-chip">🔥 <span id="streakCount">0</span> day streak</div>
+      <button class="icon-btn" onclick="App.show('profile')" aria-label="Profile">🙂</button>
+    </div>
+    <div class="ticker"><div class="ticker-track" id="tickerTrack">Loading live queue…</div></div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- HOME / FEED -->
+    <div class="screen active" id="screen-home">
+      <span class="sticker" style="margin:16px 0 10px">🔥 Trending with your squad</span>
+      <h2 style="font-size:24px;margin-bottom:14px">What are we eating today?</h2>
+
+      <div class="stall-scroll" id="stallScroll"></div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h3 style="font-size:16px">Menu</h3>
+        <span style="font-size:12px;color:var(--muted)" id="stallLabel"></span>
+      </div>
+      <div class="menu-grid" id="menuGrid"></div>
+    </div>
+
+    <!-- CART -->
+    <div class="screen" id="screen-cart">
+      <h2 style="font-size:22px;margin-bottom:14px">Your tray</h2>
+      <div id="cartArea"></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="screen" id="screen-orders">
+      <h2 style="font-size:22px;margin-bottom:14px">Your orders</h2>
+      <div id="ordersArea"></div>
+    </div>
+
+    <!-- PROFILE / REWARDS -->
+    <div class="screen" id="screen-profile">
+      <h2 style="font-size:22px;margin-bottom:14px">Your rewards</h2>
+      <div class="stat-row">
+        <div class="stat-box"><div class="num" id="statStreak">0</div><div class="lbl">Day streak</div></div>
+        <div class="stat-box"><div class="num" id="statXp">0</div><div class="lbl">XP points</div></div>
+        <div class="stat-box"><div class="num" id="statOrders">0</div><div class="lbl">Orders</div></div>
+      </div>
+      <h3 style="font-size:15px;margin-bottom:10px">Badges</h3>
+      <div class="badge-row" id="badgeRow"></div>
+      <button class="btn btn-outline danger" style="margin-top:22px" onclick="App.logout()">Log out</button>
+    </div>
+
+  </div>
+
+  <nav class="tabs">
+    <button data-tab="home" onclick="App.show('home')"><span class="icon">🏠</span>Home</button>
+    <button data-tab="cart" onclick="App.show('cart')" style="position:relative"><span class="icon">🛒</span>Tray<span class="dot-badge" id="cartDot" style="display:none"></span></button>
+    <button data-tab="orders" onclick="App.show('orders')"><span class="icon">🧾</span>Orders</button>
+    <button data-tab="profile" onclick="App.show('profile')"><span class="icon">⭐</span>Rewards</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('../service-worker.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>

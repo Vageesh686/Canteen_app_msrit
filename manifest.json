@@ -1,13 +1,13 @@
 {
-  "name": "Smart Canteen - Faculty Portal",
+  "name": "MSRIT Canteen",
   "short_name": "Canteen",
-  "description": "Faculty portal for pre-ordering from the college canteen.",
+  "description": "Pre-order from the MSRIT canteen — separate experiences for students and faculty.",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f0fdf4",
-  "theme_color": "#15803d",
+  "background_color": "#1B1033",
+  "theme_color": "#1B1033",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

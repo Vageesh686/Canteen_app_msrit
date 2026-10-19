@@ -1,630 +1,155 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-50">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Smart Canteen - Faculty Portal</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MSRIT Canteen</title>
+<meta name="theme-color" content="#1B1033">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Baloo+2:wght@500;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --f-bg:#F7F8F6; --f-ink:#121A17; --f-primary:#1C6B4F;
+    --s-bg:#1B1033; --s-ink:#FFF6EA; --s-hot:#FF3E6C; --s-sun:#FFC737; --s-mint:#33E6B8;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    overflow: hidden;
+  }
+  .split { display: flex; height: 100vh; min-height: 560px; }
+  @media (max-width: 760px) { .split { flex-direction: column; height: auto; min-height: auto; } }
 
-  <!-- PWA: installable "app" support -->
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#15803d">
-  <link rel="icon" href="/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Canteen">
+  .panel {
+    flex: 1; position: relative; display: flex; flex-direction: column;
+    justify-content: center; padding: 48px; overflow: hidden; cursor: pointer;
+    border: none; text-align: left; transition: flex .35s ease;
+  }
+  @media (max-width: 760px) { .panel { min-height: 50vh; padding: 36px 28px; } }
+  .panel:hover, .panel:focus-visible { flex: 1.12; }
+  @media (max-width: 760px) { .panel:hover, .panel:focus-visible { flex: 1; } }
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & Outfit -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- QRCode.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- Canvas Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  /* ---- Faculty half: calm ---- */
+  .panel-faculty {
+    background: var(--f-bg); color: var(--f-ink);
+    clip-path: polygon(0 0, 100% 0, 94% 100%, 0 100%);
+  }
+  @media (max-width: 760px) {
+    .panel-faculty { clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%); }
+  }
+  .panel-faculty .eyebrow { color: var(--f-primary); }
+  .panel-faculty h2 { font-size: clamp(32px, 5vw, 52px); font-weight: 700; margin: 10px 0 14px; letter-spacing: -0.02em; }
+  .panel-faculty p { color: #4B5A53; max-width: 36ch; line-height: 1.55; margin: 0 0 24px; }
+  .panel-faculty .cta {
+    background: var(--f-primary); color: #fff; border: none; padding: 13px 22px;
+    border-radius: 8px; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer;
+  }
+  .panel-faculty .cta:hover { background: #124B37; }
+  .f-icon-row { display: flex; gap: 10px; margin-bottom: 18px; color: #7C8C84; font-size: 13px; }
+  .f-icon-row span { border: 1px solid #DCE3DE; border-radius: 999px; padding: 5px 12px; }
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-              800: '#166534',
-              900: '#14532d',
-            },
-            faculty: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
-            },
-            academic: {
-              800: '#1e1b4b',
-              900: '#0f172a',
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            display: ['Outfit', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
-  <link rel="stylesheet" href="css/styles.css">
+  /* ---- Student half: loud ---- */
+  .panel-student {
+    background:
+      radial-gradient(circle at 18% 112%, rgba(255,62,108,.45), transparent 45%),
+      radial-gradient(circle at 85% -10%, rgba(51,230,184,.35), transparent 40%),
+      var(--s-bg);
+    color: var(--s-ink);
+  }
+  .panel-student::before {
+    content: ""; position: absolute; inset: 0; opacity: .5; pointer-events: none;
+    background-image: radial-gradient(rgba(255,255,255,.14) 1.4px, transparent 1.4px);
+    background-size: 15px 15px;
+  }
+  .panel-student .sticker {
+    position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px;
+    background: var(--s-sun); color: #2A1400; font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 13px; padding: 6px 14px; border-radius: 999px; transform: rotate(-4deg);
+    width: fit-content; margin-bottom: 18px; box-shadow: 0 4px 0 rgba(0,0,0,.18);
+  }
+  .panel-student .pulse { width: 7px; height: 7px; border-radius: 50%; background: #2A1400; animation: pulse 1.4s infinite; }
+  @keyframes pulse { 50% { opacity: .25; } }
+  .panel-student h2 {
+    position: relative; z-index: 1; font-family: 'Baloo 2', sans-serif; font-weight: 800;
+    font-size: clamp(38px, 6.5vw, 64px); line-height: .98; margin: 0 0 16px; letter-spacing: -0.01em;
+  }
+  .panel-student h2 em { font-style: normal; color: var(--s-sun); }
+  .panel-student p {
+    position: relative; z-index: 1; font-family: 'Manrope', sans-serif; color: #D8CBFA;
+    max-width: 34ch; line-height: 1.55; margin: 0 0 26px;
+  }
+  .panel-student .cta {
+    position: relative; z-index: 1; background: var(--s-hot); color: #fff; border: 3px solid var(--s-ink);
+    padding: 13px 24px; border-radius: 999px; font-family: 'Manrope', sans-serif; font-weight: 700;
+    font-size: 15px; cursor: pointer; transform: rotate(-1.5deg);
+    box-shadow: 4px 4px 0 var(--s-ink);
+  }
+  .panel-student .cta:hover { transform: rotate(0deg) translate(-2px,-2px); box-shadow: 6px 6px 0 var(--s-ink); }
+
+  .divider-label {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(-90deg);
+    font-family: 'Manrope', sans-serif; font-size: 11px; letter-spacing: .14em; color: #8A94A0;
+    background: #0E0820; padding: 6px 10px; border-radius: 999px; z-index: 2; white-space: nowrap;
+  }
+  @media (max-width: 760px) { .divider-label { transform: translate(-50%,-50%); top: 50%; } }
+
+  .remembered {
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+    background: #0E0820; color: #fff; font-family: 'Manrope', sans-serif; font-size: 13px;
+    padding: 9px 16px; border-radius: 999px; z-index: 3; display: none; align-items: center; gap: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.3);
+  }
+  .remembered a { color: var(--s-sun); font-weight: 700; text-decoration: none; }
+  @media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }
+</style>
 </head>
-<body class="h-full flex flex-col font-sans text-slate-800 bg-slate-50 antialiased selection:bg-faculty-500 selection:text-white">
+<body>
 
-  <!-- Top Announcement Bar for Faculty -->
-  <div class="bg-gradient-to-r from-academic-900 via-faculty-900 to-academic-800 text-white text-xs py-2 px-4 shadow-sm flex justify-between items-center z-50">
-    <div class="container mx-auto flex justify-between items-center">
-      <div class="flex items-center space-x-2">
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 uppercase tracking-wider">
-          Faculty Priority Access
-        </span>
-        <span class="hidden sm:inline text-slate-300">Dedicated Express Pickup Counter #3 Open (Lounge Level 1)</span>
-      </div>
-      <div class="flex items-center space-x-4 text-slate-300">
-        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5 text-faculty-500"></i> Pickup Window: <strong class="text-white">10:15 AM - 4:30 PM</strong></span>
-        <span class="hidden md:flex items-center gap-1 text-emerald-400"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Verified Faculty Session</span>
-      </div>
-    </div>
-  </div>
+<div class="split">
+  <button class="panel panel-faculty" onclick="choose('faculty')" aria-label="Continue as Faculty">
+    <div class="f-icon-row"><span>Pre-order</span><span>Priority pickup</span><span>Wallet</span></div>
+    <div class="eyebrow" style="font-size:13px;font-weight:600">MSRIT Canteen</div>
+    <h2>Faculty Portal</h2>
+    <p>Order ahead, skip the queue, pick up at Faculty Counter #3. Built to be quick and out of your way.</p>
+    <span class="cta">Continue as Faculty</span>
+  </button>
 
-  <!-- Main Navigation Header -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20">
-        
-        <!-- Logo & Branding -->
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('menu')">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-faculty-700 via-faculty-600 to-brand-500 p-0.5 shadow-lg shadow-faculty-500/20 flex items-center justify-center">
-            <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center">
-              <i data-lucide="utensils-crossed" class="w-6 h-6 text-emerald-400"></i>
-            </div>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-display font-extrabold text-xl text-slate-900 tracking-tight">CampusByte</span>
-              <span class="text-xs px-2 py-0.5 rounded-md font-semibold bg-faculty-100 text-faculty-800 border border-faculty-200">FACULTY PORTAL</span>
-            </div>
-            <p class="text-xs text-slate-500 font-medium">Smart Canteen Pre-ordering System</p>
-          </div>
-        </div>
+  <button class="panel panel-student" onclick="choose('student')" aria-label="Continue as Student">
+    <span class="sticker"><span class="pulse"></span> Live queue: 12 waiting</span>
+    <h2>MSRIT<br><em>Canteen</em></h2>
+    <p>Order, vote on today's food, climb the streak leaderboard. Skip the line without skipping the chaos.</p>
+    <span class="cta">I'm a Student →</span>
+  </button>
 
-        <!-- Desktop Navigation Tabs -->
-        <nav class="hidden md:flex items-center space-x-1 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/60">
-          <button id="nav-menu" onclick="navigateTo('menu')" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 text-faculty-700 bg-white shadow-sm">
-            <i data-lucide="book-open-text" class="w-4 h-4"></i> Menu & Order
-          </button>
-          <button id="nav-orders" onclick="navigateTo('orders')" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-white/60 relative">
-            <i data-lucide="shopping-bag" class="w-4 h-4"></i> My Orders
-            <span id="active-orders-badge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-pulse">0</span>
-          </button>
-          <button id="nav-profile" onclick="navigateTo('profile')" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-white/60">
-            <i data-lucide="user-check" class="w-4 h-4"></i> Faculty Card
-          </button>
-        </nav>
+  <div class="divider-label">choose your portal</div>
+</div>
 
-        <!-- Right Side Controls (Wallet, Notifications, Cart) -->
-        <div class="flex items-center space-x-3">
-          
-          <!-- Wallet Balance Quick Widget -->
-          <div class="hidden sm:flex items-center gap-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-1.5 pr-4 shadow-sm hover:border-emerald-300 transition cursor-pointer" onclick="openWalletModal()">
-            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-600/20">
-              <i data-lucide="wallet" class="w-5 h-5"></i>
-            </div>
-            <div class="text-left">
-              <span class="block text-[10px] uppercase font-bold tracking-wider text-emerald-700">Faculty Wallet</span>
-              <span id="header-wallet-balance" class="font-display font-bold text-slate-900 text-sm">₹1,450.00</span>
-            </div>
-            <button class="ml-1 text-emerald-700 hover:text-emerald-900 p-1 rounded-lg hover:bg-emerald-100 transition" title="Top Up Balance">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            </button>
-          </div>
+<div class="remembered" id="rememberedBar"></div>
 
-          <!-- Notification Bell button -->
-          <div class="relative">
-            <button onclick="toggleNotificationDrawer()" class="p-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200/70 transition relative">
-              <i data-lucide="bell" class="w-5 h-5"></i>
-              <span id="notif-badge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white"></span>
-            </button>
-          </div>
-
-          <!-- Shopping Cart Drawer Trigger -->
-          <button onclick="toggleCartDrawer()" class="p-2.5 sm:px-4 sm:py-2.5 rounded-2xl bg-faculty-600 hover:bg-faculty-700 text-white font-semibold shadow-lg shadow-faculty-600/25 transition flex items-center gap-2">
-            <div class="relative">
-              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-              <span id="cart-badge" class="absolute -top-2 -right-2 bg-amber-400 text-slate-900 text-[11px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-white">0</span>
-            </div>
-            <span class="hidden sm:inline text-sm font-medium">Cart</span>
-            <span id="cart-header-total" class="hidden lg:inline text-xs bg-faculty-800/60 px-2 py-0.5 rounded-lg border border-faculty-500/30">₹0.00</span>
-          </button>
-
-          <!-- Faculty Profile Mini Pill -->
-          <div onclick="navigateTo('profile')" class="hidden md:flex items-center gap-2 pl-2 border-l border-slate-200 cursor-pointer">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-academic-800 to-faculty-800 text-white font-bold flex items-center justify-center shadow-md text-sm border-2 border-white">
-              <span id="header-avatar-initials">DR</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Notification Drawer Dropdown -->
-  <div id="notification-drawer" class="hidden fixed top-24 right-4 sm:right-8 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 z-50 overflow-hidden transform transition-all duration-300">
-    <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
-      <div class="flex items-center gap-2">
-        <i data-lucide="bell" class="w-5 h-5 text-emerald-400"></i>
-        <h3 class="font-display font-bold text-base">Faculty Notifications</h3>
-      </div>
-      <button onclick="markAllNotificationsRead()" class="text-xs text-slate-400 hover:text-emerald-400 transition">Mark all read</button>
-    </div>
-    <div id="notification-list" class="max-h-80 overflow-y-auto divide-y divide-slate-100 p-2">
-      <!-- Dynamic Notification Items rendered via app.js -->
-    </div>
-  </div>
-
-  <!-- MAIN CONTAINER WITH TABS -->
-  <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <!-- ========================================== -->
-    <!-- TAB 1: MENU & ORDERING (FACULTY VIEW)      -->
-    <!-- ========================================== -->
-    <section id="tab-menu" class="space-y-8">
-      
-      <!-- Faculty Welcome & Quick Status Banner -->
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-academic-900 via-slate-900 to-faculty-900 text-white p-6 sm:p-8 shadow-xl">
-        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-faculty-500/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div class="space-y-2 max-w-2xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs text-emerald-300 font-semibold">
-              <i data-lucide="award" class="w-4 h-4 text-amber-300"></i> <span id="faculty-dept-badge">Department of Computer Science & Engineering</span>
-            </div>
-            <h1 class="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight">
-              Good day, <span id="faculty-greeting-name" class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-sky-300">Prof. Rajesh Sharma</span>
-            </h1>
-            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-              Pre-order your morning breakfast or lunch break meal directly from your office. Skip the student crowd with priority pickup at <strong class="text-white">Faculty Counter #3</strong>.
-            </p>
-          </div>
-
-          <!-- Quick Actions & Stats -->
-          <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full md:w-auto">
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 p-4 rounded-2xl flex-1 md:flex-initial min-w-[130px]">
-              <span class="block text-xs text-slate-300 font-medium">Emp ID</span>
-              <span id="faculty-emp-id" class="font-mono font-bold text-white text-base">EMP-CSE-4029</span>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md border border-white/15 p-4 rounded-2xl flex-1 md:flex-initial min-w-[130px]">
-              <span class="block text-xs text-slate-300 font-medium">Faculty Discount</span>
-              <span class="font-display font-bold text-emerald-400 text-base">5% Special Perk</span>
-            </div>
-            <button onclick="openWalletModal()" class="w-full sm:w-auto px-5 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Funds
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Search, Filter & Availability Controls -->
-      <div class="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-slate-200/80 space-y-4">
-        
-        <!-- Search and Live Filters -->
-        <div class="flex flex-col lg:flex-row gap-4 justify-between items-center">
-          
-          <!-- Search Bar -->
-          <div class="relative w-full lg:w-96">
-            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
-            <input type="text" id="menu-search-input" oninput="handleMenuFilter()" placeholder="Search Dosa, Thali, Coffee, Sandwiches..." class="w-full pl-12 pr-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-faculty-500 focus:bg-white transition">
-          </div>
-
-          <!-- Category Pill Buttons -->
-          <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 scrollbar-none">
-            <button onclick="filterCategory('All')" class="cat-btn active px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition whitespace-nowrap bg-faculty-600 text-white shadow-md shadow-faculty-600/20">
-              All Items
-            </button>
-            <button onclick="filterCategory('Faculty Combos')" class="cat-btn px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap flex items-center gap-1.5">
-              <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i> Faculty Express Combos
-            </button>
-            <button onclick="filterCategory('Breakfast')" class="cat-btn px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap">
-              Breakfast
-            </button>
-            <button onclick="filterCategory('Meals')" class="cat-btn px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap">
-              Meals & Thalis
-            </button>
-            <button onclick="filterCategory('Snacks')" class="cat-btn px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap">
-              Snacks
-            </button>
-            <button onclick="filterCategory('Beverages')" class="cat-btn px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap">
-              Beverages
-            </button>
-          </div>
-
-          <!-- Availability & Dietary Toggle -->
-          <div class="flex items-center justify-between w-full lg:w-auto gap-4 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100">
-            <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-              <input type="checkbox" id="toggle-available-only" onchange="handleMenuFilter()" class="w-4 h-4 rounded text-faculty-600 focus:ring-faculty-500">
-              <span>In Stock Only</span>
-            </label>
-            <div class="text-xs text-slate-400 font-medium">
-              Showing <span id="item-count-display" class="font-bold text-slate-800">8</span> items
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Food Menu Items Grid -->
-      <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <!-- Dynamic Menu Cards injected via app.js -->
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- TAB 2: MY ORDERS & LIVE TRACKING           -->
-    <!-- ========================================== -->
-    <section id="tab-orders" class="hidden space-y-8">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 class="font-display font-extrabold text-2xl text-slate-900 tracking-tight">Order History & Live Tracking</h2>
-          <p class="text-sm text-slate-500">Track current preparation status or re-order your favorite faculty meals.</p>
-        </div>
-        <button onclick="renderOrders()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-2 border border-slate-200 transition">
-          <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Refresh Orders
-        </button>
-      </div>
-
-      <!-- Orders List Container -->
-      <div id="orders-container" class="space-y-6">
-        <!-- Dynamic Order Cards injected via app.js -->
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- TAB 3: FACULTY CARD & WALLET PROFILE       -->
-    <!-- ========================================== -->
-    <section id="tab-profile" class="hidden space-y-8 max-w-4xl mx-auto">
-      <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-        
-        <!-- Profile Banner -->
-        <div class="h-40 bg-gradient-to-r from-academic-900 via-faculty-900 to-slate-900 relative">
-          <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        </div>
-
-        <div class="px-8 pb-8 relative">
-          <!-- Avatar & Primary Info -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end -mt-16 mb-6 gap-4">
-            <div class="flex items-end gap-4">
-              <div class="w-28 h-28 rounded-3xl bg-academic-800 border-4 border-white shadow-xl flex items-center justify-center text-white text-3xl font-extrabold">
-                <span id="profile-avatar-large">DR</span>
-              </div>
-              <div class="mb-2">
-                <h2 id="profile-full-name" class="font-display font-bold text-2xl text-slate-900">Prof. Rajesh Sharma</h2>
-                <p id="profile-dept-name" class="text-sm text-slate-500 font-medium">Associate Professor, Department of Computer Science</p>
-              </div>
-            </div>
-
-            <button onclick="openWalletModal()" class="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center gap-2">
-              <i data-lucide="wallet" class="w-4 h-4"></i> Manage Wallet Balance
-            </button>
-          </div>
-
-          <!-- Details Grid (Class Diagram UML properties mapping) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
-            
-            <!-- Class Diagram Attribute Card 1 -->
-            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Class Diagram UML Property</span>
-                <span class="text-xs bg-faculty-100 text-faculty-800 px-2 py-0.5 rounded font-mono">Teacher.employeeId</span>
-              </div>
-              <div>
-                <span class="block text-xs text-slate-500">Employee Identification Number</span>
-                <span id="profile-emp-id-val" class="font-mono font-bold text-lg text-slate-900">EMP-CSE-4029</span>
-              </div>
-            </div>
-
-            <!-- Class Diagram Attribute Card 2 -->
-            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Class Diagram UML Property</span>
-                <span class="text-xs bg-faculty-100 text-faculty-800 px-2 py-0.5 rounded font-mono">Teacher.walletBalance</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <div>
-                  <span class="block text-xs text-slate-500">Active Balance</span>
-                  <span id="profile-wallet-val" class="font-display font-extrabold text-2xl text-emerald-600">₹1,450.00</span>
-                </div>
-                <span class="text-xs font-medium text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full">Auto-Deduct Ready</span>
-              </div>
-            </div>
-
-            <!-- User Superclass Attributes -->
-            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Class Diagram UML Property</span>
-                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-mono">User (Inherited)</span>
-              </div>
-              <div class="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                  <span class="text-slate-400 block">Email Address</span>
-                  <span class="font-semibold text-slate-800">r.sharma@msrit.edu</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block">Phone Contact</span>
-                  <span class="font-semibold text-slate-800">+91 98765 43210</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Priority Privileges -->
-            <div class="p-5 rounded-2xl bg-gradient-to-br from-faculty-50 to-slate-50 border border-faculty-200 space-y-3">
-              <div class="flex items-center gap-2 text-faculty-800 font-bold text-sm">
-                <i data-lucide="shield-check" class="w-5 h-5 text-faculty-600"></i> Faculty Perks & Express Clearance
-              </div>
-              <ul class="text-xs text-slate-600 space-y-2">
-                <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Priority pickup slot reservation (0-delay prep queue)</li>
-                <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Free cancellation with 100% wallet refund before preparation</li>
-                <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Access to Faculty Lounge Counter #3</li>
-              </ul>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ========================================== -->
-  <!-- SLIDE-OVER CART DRAWER                     -->
-  <!-- ========================================== -->
-  <div id="cart-drawer-overlay" onclick="toggleCartDrawer()" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 transition-opacity"></div>
-  
-  <div id="cart-drawer" class="fixed inset-y-0 right-0 max-w-full flex pl-10 z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
-    <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
-      
-      <!-- Drawer Header -->
-      <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-faculty-600 flex items-center justify-center text-white">
-            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="font-display font-bold text-lg">Faculty Cart</h3>
-            <p class="text-xs text-slate-400">Class Diagram: <code class="text-emerald-400">Cart & CartItem</code></p>
-          </div>
-        </div>
-        <button onclick="toggleCartDrawer()" class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition">
-          <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-      </div>
-
-      <!-- Express Pickup Slot Selector (Faculty Feature) -->
-      <div class="p-4 bg-faculty-50 border-b border-faculty-100 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i data-lucide="clock" class="w-4 h-4 text-faculty-700"></i>
-          <span class="text-xs font-bold text-faculty-900">Pickup Window Slot:</span>
-        </div>
-        <select id="pickup-slot-select" class="text-xs bg-white border border-faculty-300 rounded-xl px-2.5 py-1.5 font-medium text-slate-800 focus:ring-2 focus:ring-faculty-500">
-          <option value="Immediate (10-15 mins)">Immediate (10-15 mins)</option>
-          <option value="Morning Break (11:00 AM)">Morning Break (11:00 AM)</option>
-          <option value="Lunch Slot 1 (1:15 PM)">Lunch Slot 1 (1:15 PM)</option>
-          <option value="Afternoon Tea (3:30 PM)">Afternoon Tea (3:30 PM)</option>
-        </select>
-      </div>
-
-      <!-- Cart Items List -->
-      <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4 divide-y divide-slate-100">
-        <!-- Cart Items rendered via app.js -->
-      </div>
-
-      <!-- Cart Footer / Summary -->
-      <div class="p-6 bg-slate-50 border-t border-slate-200 space-y-4">
-        
-        <div class="space-y-2 text-sm">
-          <div class="flex justify-between text-slate-600">
-            <span>Subtotal</span>
-            <span id="cart-subtotal" class="font-semibold text-slate-800">₹0.00</span>
-          </div>
-          <div class="flex justify-between text-emerald-700">
-            <span>Faculty Discount (5%)</span>
-            <span id="cart-discount" class="font-semibold">-₹0.00</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Taxes & Canteen Handling</span>
-            <span id="cart-tax" class="font-semibold text-slate-800">₹0.00</span>
-          </div>
-          <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
-            <span class="font-display font-bold text-base text-slate-900">Total Amount</span>
-            <span id="cart-total" class="font-display font-extrabold text-2xl text-faculty-700">₹0.00</span>
-          </div>
-        </div>
-
-        <!-- Payment Method Choice for Order -->
-        <div class="space-y-2 pt-2">
-          <span class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Payment Method</span>
-          <div class="grid grid-cols-3 gap-2">
-            <label class="pay-option border border-slate-300 rounded-2xl p-2.5 text-center cursor-pointer hover:border-emerald-500 transition bg-white shadow-sm flex flex-col items-center justify-center">
-              <input type="radio" name="payment-mode" value="Wallet" checked class="hidden">
-              <i data-lucide="wallet" class="w-4 h-4 text-emerald-600 mb-1"></i>
-              <span class="text-[11px] font-bold text-slate-800">Wallet</span>
-            </label>
-            <label class="pay-option border border-slate-200 rounded-2xl p-2.5 text-center cursor-pointer hover:border-emerald-500 transition bg-white shadow-sm flex flex-col items-center justify-center">
-              <input type="radio" name="payment-mode" value="UPI" class="hidden">
-              <i data-lucide="qr-code" class="w-4 h-4 text-faculty-600 mb-1"></i>
-              <span class="text-[11px] font-bold text-slate-800">UPI / QR</span>
-            </label>
-            <label class="pay-option border border-slate-200 rounded-2xl p-2.5 text-center cursor-pointer hover:border-emerald-500 transition bg-white shadow-sm flex flex-col items-center justify-center">
-              <input type="radio" name="payment-mode" value="Counter" class="hidden">
-              <i data-lucide="coins" class="w-4 h-4 text-amber-600 mb-1"></i>
-              <span class="text-[11px] font-bold text-slate-800">Pay Counter</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Place Order Button -->
-        <button id="btn-place-order" onclick="processCheckout()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-faculty-600 via-faculty-700 to-emerald-600 hover:from-faculty-700 hover:to-emerald-700 text-white font-extrabold text-base shadow-xl shadow-faculty-600/30 transition flex items-center justify-center gap-2">
-          <i data-lucide="check-circle" class="w-5 h-5"></i> Place Faculty Order
-        </button>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- WALLET TOP-UP MODAL                       -->
-  <!-- ========================================== -->
-  <div id="wallet-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-6 relative border border-slate-100">
-      <button onclick="closeWalletModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-2">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-          <i data-lucide="wallet" class="w-6 h-6"></i>
-        </div>
-        <div>
-          <h3 class="font-display font-bold text-xl text-slate-900">Faculty Canteen Wallet</h3>
-          <p class="text-xs text-slate-500">Fast 1-click checkout for staff members</p>
-        </div>
-      </div>
-
-      <div class="p-4 rounded-2xl bg-slate-900 text-white flex justify-between items-center">
-        <div>
-          <span class="text-xs text-slate-400 block font-medium">Current Balance</span>
-          <span id="modal-wallet-balance" class="font-display font-extrabold text-2xl text-emerald-400">₹1,450.00</span>
-        </div>
-        <span class="text-[11px] px-2.5 py-1 bg-emerald-500/20 text-emerald-300 rounded-full font-semibold border border-emerald-400/30">Verified Staff</span>
-      </div>
-
-      <div class="space-y-3">
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Select Top-Up Amount</label>
-        <div class="grid grid-cols-3 gap-3">
-          <button onclick="selectTopUpAmount(200)" class="topup-btn py-3 rounded-2xl border border-slate-200 font-bold text-sm text-slate-800 hover:border-emerald-500 hover:bg-emerald-50 transition">₹200</button>
-          <button onclick="selectTopUpAmount(500)" class="topup-btn py-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-bold text-sm text-emerald-800">₹500</button>
-          <button onclick="selectTopUpAmount(1000)" class="topup-btn py-3 rounded-2xl border border-slate-200 font-bold text-sm text-slate-800 hover:border-emerald-500 hover:bg-emerald-50 transition">₹1,000</button>
-        </div>
-        <input type="number" id="custom-topup-input" placeholder="Or enter custom amount (₹)" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-      </div>
-
-      <button onclick="executeWalletTopUp()" class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
-        <i data-lucide="shield-check" class="w-5 h-5"></i> Confirm Instant Wallet Top-Up
-      </button>
-    </div>
-  </div>
-
-  <!-- ========================================== -->
-  <!-- ORDER RECEIPT & DIGITAL TOKEN MODAL        -->
-  <!-- ========================================== -->
-  <div id="receipt-modal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
-      
-      <button onclick="closeReceiptModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-2">
-        <i data-lucide="x" class="w-6 h-6"></i>
-      </button>
-
-      <!-- Printable Order Receipt Content -->
-      <div id="receipt-printable-content" class="space-y-6">
-        
-        <div class="text-center space-y-2 border-b border-slate-100 pb-4">
-          <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2">
-            <i data-lucide="check-circle-2" class="w-8 h-8"></i>
-          </div>
-          <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs rounded-full">Order Successfully Placed</span>
-          <h2 class="font-display font-extrabold text-2xl text-slate-900">Faculty Priority Token</h2>
-          <p class="text-xs text-slate-500">Show this QR or Digital Token at <strong class="text-slate-800">Faculty Counter #3</strong></p>
-        </div>
-
-        <!-- Big Token Number & QR Code -->
-        <div class="bg-gradient-to-br from-academic-900 to-faculty-900 text-white p-6 rounded-3xl text-center space-y-4 shadow-xl">
-          <div class="text-xs font-semibold text-emerald-300 uppercase tracking-widest">Digital Token ID</div>
-          <div id="receipt-token-id" class="font-display font-extrabold text-4xl sm:text-5xl text-amber-300 tracking-wider">#FAC-8902</div>
-          
-          <!-- QR Code Container -->
-          <div class="bg-white p-4 rounded-2xl inline-block mx-auto shadow-md">
-            <div id="qrcode-canvas" class="flex justify-center"></div>
-          </div>
-          <p class="text-[11px] text-slate-300">Scan at Canteen Express Kiosk for Instant Handover</p>
-        </div>
-
-        <!-- Order Metadata & Details -->
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
-          <div class="flex justify-between"><span class="text-slate-500">Order ID:</span><span id="receipt-order-id" class="font-mono font-bold text-slate-800">#ORD-90823</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">Faculty Member:</span><span id="receipt-faculty-name" class="font-bold text-slate-800">Prof. Rajesh Sharma</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">Department:</span><span id="receipt-faculty-dept" class="font-medium text-slate-800">Computer Science</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">Pickup Slot:</span><span id="receipt-slot" class="font-bold text-faculty-700">Immediate Express</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">Payment Status:</span><span id="receipt-payment-status" class="font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">SUCCESS (Wallet)</span></div>
-        </div>
-
-        <!-- Item Breakdown -->
-        <div class="space-y-2">
-          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ordered Items</h4>
-          <div id="receipt-items-list" class="divide-y divide-slate-100 text-sm">
-            <!-- Dynamic Receipt Items -->
-          </div>
-          <div class="pt-3 border-t border-slate-200 flex justify-between items-center font-bold text-base text-slate-900">
-            <span>Total Paid</span>
-            <span id="receipt-total-paid" class="text-emerald-600 font-display">₹0.00</span>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="flex gap-3 pt-2">
-        <button onclick="window.print()" class="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm transition flex items-center justify-center gap-2">
-          <i data-lucide="printer" class="w-4 h-4"></i> Print Receipt
-        </button>
-        <button onclick="navigateTo('orders'); closeReceiptModal();" class="flex-1 py-3 rounded-2xl bg-faculty-600 hover:bg-faculty-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
-          <i data-lucide="clock" class="w-4 h-4"></i> Track Live Status
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
-    <div class="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div>
-        <strong class="text-slate-700">CampusByte Canteen Preordering System</strong> — Faculty Module Prototype
-      </div>
-      <div class="flex items-center gap-4 text-slate-400">
-        <span>UML Specs Compliant</span>
-        <span>•</span>
-        <span>SIH 2026 Solution</span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Main JavaScript App Code -->
-  <script src="js/app.js"></script>
-
-  <!-- PWA: register service worker so the app installs and works offline -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js').catch(console.error);
-      });
-    }
-  </script>
+<script>
+  function choose(role) {
+    localStorage.setItem('msrit_role', role);
+    window.location.href = role === 'faculty' ? 'faculty/index.html' : 'student/index.html';
+  }
+  (function () {
+    const last = localStorage.getItem('msrit_role');
+    if (!last) return;
+    const bar = document.getElementById('rememberedBar');
+    const label = last === 'faculty' ? 'Faculty' : 'Student';
+    const href = last === 'faculty' ? 'faculty/index.html' : 'student/index.html';
+    bar.innerHTML = `Last time you used <b>${label}</b> &nbsp;·&nbsp; <a href="${href}">Jump back in</a>`;
+    bar.style.display = 'flex';
+  })();
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js').catch(() => {}));
+  }
+</script>
 </body>
 </html>

@@ -1,42 +1,31 @@
-// Bump this on every deploy that changes cached files, so old installs pick up the update.
-const CACHE_NAME = 'smart-canteen-v1';
+// Bump this whenever a deployed file changes, so old installs pick up the update.
+const CACHE_NAME = 'msrit-canteen-v1';
 
 const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/', '/index.html', '/manifest.json',
+  '/icons/icon-192.png', '/icons/icon-512.png',
+  '/faculty/index.html', '/faculty/css/styles.css', '/faculty/js/app.js',
+  '/student/index.html', '/student/css/styles.css', '/student/js/app.js'
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
   );
   self.clients.claim();
 });
 
-// Network-first for navigations (so faculty always see the latest menu/orders when online),
-// falling back to the cached shell when offline. Cache-first for static assets.
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request).catch(() => caches.match('/index.html'))
-    );
+    event.respondWith(fetch(request).catch(() => caches.match(request) || caches.match('/index.html')));
     return;
   }
 
